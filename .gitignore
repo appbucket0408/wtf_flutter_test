@@ -18,3 +18,6 @@
 **/google-services.json
 **/.env
 token_server/node_modules/
+
+# Kotlin compiler session cache
+**/android/.kotlin/
