@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "126066432752",
+    "project_id": "wtf-guru-trainer",
+    "storage_bucket": "wtf-guru-trainer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126066432752:android:3c2d9104175eee1e5fc035",
+        "android_client_info": {
+          "package_name": "com.wtf.guru"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaAnyeTLJLoyOD-k6PgQWPHYjXnzNW0yo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126066432752:android:d4f793bd71f63ca55fc035",
+        "android_client_info": {
+          "package_name": "com.wtf.trainer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaAnyeTLJLoyOD-k6PgQWPHYjXnzNW0yo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
