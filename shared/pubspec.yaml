@@ -1,0 +1,28 @@
+name: wtf_shared
+description: "Shared models, services, API layer, widgets and utils for WTF Guru & Trainer apps."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.0
+  cloud_firestore: ^6.1.2
+  firebase_core: ^4.3.0
+  hive_flutter: ^1.1.0
+  agora_rtc_engine: ^6.5.2
+  permission_handler: ^12.0.1
+  dio: ^5.7.0
+  intl: ^0.20.2
+  fluttertoast: ^9.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
