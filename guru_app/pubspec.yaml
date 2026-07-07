@@ -1,0 +1,26 @@
+name: guru_app
+description: "WTF Guru (Member) app — chat, call scheduling and 100ms video calls with your trainer."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  wtf_shared:
+    path: ../shared
+  flutter_bloc: ^9.1.0
+  firebase_core: ^4.3.0
+  hive_flutter: ^1.1.0
+  intl: ^0.20.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
