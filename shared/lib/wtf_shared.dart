@@ -21,6 +21,8 @@ export 'services/auth_service.dart';
 export 'services/call_service.dart';
 export 'services/chat_service.dart';
 export 'services/log_service.dart';
+export 'services/notification_coordinator.dart';
+export 'services/notification_service.dart';
 export 'services/schedule_service.dart';
 export 'utils/app_colors.dart';
 export 'utils/app_exception.dart';

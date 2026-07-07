@@ -54,9 +54,42 @@ class _Root extends StatelessWidget {
         AuthReady(:final user) => DevPanel(
             appName: 'Trainer',
             env: const {'TOKEN_URL': ApiEndpoints.baseUrl},
-            child: HomeScreen(user: user),
+            child: _NotificationGate(user: user),
           ),
       },
     );
   }
+}
+
+/// Starts local notifications once Aarav is signed in (spec §15 stretch).
+class _NotificationGate extends StatefulWidget {
+  final AppUser user;
+  const _NotificationGate({required this.user});
+
+  @override
+  State<_NotificationGate> createState() => _NotificationGateState();
+}
+
+class _NotificationGateState extends State<_NotificationGate> {
+  NotificationCoordinator? _coordinator;
+
+  @override
+  void initState() {
+    super.initState();
+    _coordinator = NotificationCoordinator(
+      notif: NotificationService.instance,
+      chat: chatService,
+      schedule: scheduleService,
+      me: widget.user,
+    )..start(peerId: SeedIds.memberDk);
+  }
+
+  @override
+  void dispose() {
+    _coordinator?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => HomeScreen(user: widget.user);
 }

@@ -19,6 +19,8 @@ dependencies:
   dio: ^5.7.0
   intl: ^0.20.2
   fluttertoast: ^9.0.0
+  flutter_local_notifications: ^19.0.0
+  timezone: ^0.10.0
 
 dev_dependencies:
   flutter_test:

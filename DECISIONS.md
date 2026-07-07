@@ -32,3 +32,14 @@
 - Fixed uid mapping (member_dk→1, trainer_aarav→2), both joining as `PUBLISHER` in a `communication` profile; role names still stored in `RoomMeta` for parity with the original design.
 
 **Trade-off:** the spec scores "100ms Calls (25)" — this deviation is documented per the spec's own escape clause ("If exact API calls differ, document your approach and show it working"). Token expiry handled by one re-fetch + retry on join error; reconnection via `onConnectionStateChanged` loader overlay.
+
+## ADR #4 — Notifications: local (flutter_local_notifications), not FCM
+
+**Decision:** Local notifications driven by the app's existing Firestore listeners — no Cloud Functions / FCM.
+
+**Rationale:**
+- Spec §15 lists notifications as a stretch and specifically suggests "local scheduled for reminder".
+- FCM background push would require a Cloud Function on the Blaze (paid) plan to send on Firestore writes — out of proportion for a stretch item and blocked without billing.
+- `NotificationCoordinator` subscribes to the same message/request streams the UI already uses, firing heads-up notifications for new items (arrivals after app start, so history isn't replayed) and scheduling a 10-min-before-call reminder via `zonedSchedule`.
+
+**Trade-off:** notifications deliver while the app is alive (foreground/background), not when fully killed — acceptable for the stretch scope; a follow-up FCM path is noted in the README if killed-app delivery is later required. Android only (per request): `POST_NOTIFICATIONS` + exact-alarm permissions, core-library desugaring enabled.

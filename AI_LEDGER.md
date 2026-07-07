@@ -19,5 +19,7 @@
 | 13 | Claude Code | Chat feature | "Conversation bloc + shared screen: receipts, simulated typing 400–800ms, quick replies, unread badges" | `ConversationBloc` + `ConversationScreen` shared by both apps | chat commit |
 | 14 | Claude Code | Scheduler | "Guru 3-day/30-min scheduler + trainer approve/decline with reason modal, conflict check" | ScheduleCubit/RequestsCubit; system messages on approve/decline | scheduler commit |
 | 15 | Claude Code | Video calls | "AgoraCallService + CallCubit: preview → join → controls → reconnect → SessionLog" | Full §3D flow incl. token-expiry retry, peer-left state, post-call sheets | calls commit |
+| 16 | Claude Code | Runtime verification | Drove emulator + physical phone via adb/screenshots to walk the 9-step manual test; confirmed Firestore cross-app sync live | Trainer login + DK onboarding verified against real Firebase | — |
+| 17 | Claude Code | Push notifications (§15 stretch) | "Implement local push notifications for Android only" | `NotificationService` (flutter_local_notifications) + `NotificationCoordinator` bridging Firestore streams → heads-up alerts (new message / approval / new request) + 10-min call reminder; manifest perms + core-library desugaring | notifications commit |
 
 **Debugging-with-AI entries:** #10 (deprecation), #11 (cross-provider migration), plus analyzer-driven fixes (unused imports, unnecessary casts) each round — `flutter analyze` kept at zero warnings after every task.
