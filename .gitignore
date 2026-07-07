@@ -1,0 +1,20 @@
+# Flutter / Dart
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/pubspec.lock
+**/*.iml
+**/.idea/
+**/android/.gradle/
+**/android/local.properties
+**/android/app/.cxx/
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral/
+.DS_Store
+
+# Secrets — never commit
+**/google-services.json
+**/.env
+token_server/node_modules/
