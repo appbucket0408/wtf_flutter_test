@@ -26,6 +26,12 @@ abstract final class AppStrings {
   static const tokenFetchFailed = 'Could not get call access. Please retry.';
   static const roomCreateFailed = 'Could not create the call room. Please retry.';
   static const chatSendFailed = 'Message not sent. Tap to retry.';
+  static const attachmentTooLarge =
+      'File is too large. Please pick one under 700 KB.';
+  static const attachmentFailed = 'Could not attach the file. Please try again.';
+  static const unsupportedFileType =
+      'Only images and documents can be shared.';
+  static const photoLabel = '📷 Photo';
   static const copyError = 'Copy error';
   static const retry = 'Retry';
 

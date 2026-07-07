@@ -68,13 +68,15 @@ class FirebaseChatService implements ChatService {
   @override
   Future<void> send(Message m) async {
     try {
+      final sent = m.copyWith(status: MessageStatus.sent);
       final batch = _db.batch();
-      batch.set(_messages(m.chatId).doc(m.id),
-          m.copyWith(status: MessageStatus.sent).toMap());
+      // Full message (may carry base64 attachment) in the subcollection…
+      batch.set(_messages(m.chatId).doc(m.id), sent.toMap());
+      // …but the chat-list preview strips the blob to stay under 1 MB.
       batch.set(
         _chat(m.chatId),
         {
-          'lastMessage': m.copyWith(status: MessageStatus.sent).toMap(),
+          'lastMessage': sent.toPreview().toMap(),
           'unread_${m.receiverId}': FieldValue.increment(1),
         },
         SetOptions(merge: true),

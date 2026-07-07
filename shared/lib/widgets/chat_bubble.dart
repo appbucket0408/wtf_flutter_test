@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../models/message.dart';
 import '../utils/app_colors.dart';
@@ -19,6 +24,64 @@ class ChatBubble extends StatelessWidget {
     required this.isMine,
     required this.roleColor,
   });
+
+  Widget _attachment(BuildContext context) {
+    final data = message.attachmentData;
+    if (data == null) {
+      // Preview copy (blob stripped) — show a lightweight placeholder.
+      return _docChip(context, openable: false);
+    }
+    if (message.attachmentType == AttachmentType.image) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: Gap.s4),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.memory(
+            base64Decode(data),
+            width: 200,
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+    return _docChip(context, openable: true);
+  }
+
+  Widget _docChip(BuildContext context, {required bool openable}) {
+    final onLight = !isMine;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Gap.s4),
+      child: InkWell(
+        onTap: openable ? () => _openDocument(context) : null,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.insert_drive_file,
+                size: 28,
+                color: onLight ? AppColors.grey700 : AppColors.white),
+            const SizedBox(width: Gap.s8),
+            Flexible(
+              child: Text(
+                message.attachmentName ?? 'Document',
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodySmall.copyWith(
+                    color: onLight ? AppColors.grey900 : AppColors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openDocument(BuildContext context) async {
+    final data = message.attachmentData;
+    if (data == null) return;
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/${message.attachmentName ?? message.id}');
+    await file.writeAsBytes(base64Decode(data));
+    await OpenFilex.open(file.path);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,11 +128,13 @@ class ChatBubble extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                message.text,
-                style: AppTextStyles.body.copyWith(
-                    color: isMine ? AppColors.white : AppColors.grey900),
-              ),
+              if (message.hasAttachment) _attachment(context),
+              if (message.text.isNotEmpty)
+                Text(
+                  message.text,
+                  style: AppTextStyles.body.copyWith(
+                      color: isMine ? AppColors.white : AppColors.grey900),
+                ),
               const SizedBox(height: Gap.s4),
               Row(
                 mainAxisSize: MainAxisSize.min,

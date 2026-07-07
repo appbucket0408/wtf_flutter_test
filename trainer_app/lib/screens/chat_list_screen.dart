@@ -71,7 +71,7 @@ class ChatListScreen extends StatelessWidget {
                       subtitle: Text(
                         summary.typingUserId == dk.id
                             ? AppStrings.typing
-                            : (last?.text ?? AppStrings.emptyChat),
+                            : (last?.preview ?? AppStrings.emptyChat),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.bodySmall,

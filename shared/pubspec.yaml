@@ -21,6 +21,10 @@ dependencies:
   fluttertoast: ^9.0.0
   flutter_local_notifications: ^19.0.0
   timezone: ^0.10.0
+  image_picker: ^1.1.2
+  file_picker: ^8.1.4
+  open_filex: ^4.5.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

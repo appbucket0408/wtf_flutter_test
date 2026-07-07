@@ -1,15 +1,25 @@
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../blocs/conversation_bloc.dart';
 import '../models/app_user.dart';
+import '../models/message.dart';
 import '../services/chat_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_strings.dart';
 import '../utils/app_text_styles.dart';
+import '../utils/app_toast.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/typing_dots.dart';
+
+/// Firestore keeps docs under 1 MB; base64 inflates ~33%, so cap raw
+/// files at 700 KB (spec §15 attachments — images + documents only).
+const int kMaxAttachmentBytes = 700 * 1024;
 
 /// One conversation, shared by both apps (spec §3B). The opener passes
 /// who they are, who they're chatting with, and their role color.
@@ -95,6 +105,98 @@ class _ConversationViewState extends State<_ConversationView> {
       _scrollController.animateTo(0,
           duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
     }
+  }
+
+  /// Validates size, base64-encodes and dispatches. Shows a toast if the
+  /// file exceeds the Firestore-safe limit (user-requested error UX).
+  Future<void> _sendAttachment(
+    BuildContext context, {
+    required AttachmentType type,
+    required String name,
+    required List<int> bytes,
+  }) async {
+    if (bytes.length > kMaxAttachmentBytes) {
+      await AppToast.error(AppStrings.attachmentTooLarge);
+      return;
+    }
+    context.read<ConversationBloc>().add(AttachmentSent(
+          type: type,
+          name: name,
+          base64: base64Encode(bytes),
+        ));
+  }
+
+  Future<void> _pickImage(BuildContext context) async {
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70, // compress to help stay under the size cap
+      );
+      if (picked == null) return;
+      final bytes = await picked.readAsBytes();
+      if (!context.mounted) return;
+      await _sendAttachment(
+        context,
+        type: AttachmentType.image,
+        name: picked.name,
+        bytes: bytes,
+      );
+    } catch (_) {
+      await AppToast.error(AppStrings.attachmentFailed);
+    }
+  }
+
+  Future<void> _pickDocument(BuildContext context) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        // Documents only — explicitly no video/audio.
+        allowedExtensions: const [
+          'pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx', 'ppt', 'pptx', 'csv',
+        ],
+        withData: true,
+      );
+      final file = result?.files.firstOrNull;
+      if (file == null || file.bytes == null || !context.mounted) return;
+      await _sendAttachment(
+        context,
+        type: AttachmentType.document,
+        name: file.name,
+        bytes: file.bytes!,
+      );
+    } catch (_) {
+      await AppToast.error(AppStrings.attachmentFailed);
+    }
+  }
+
+  void _showAttachMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.image, color: AppColors.guruPrimary),
+              title: const Text('Image'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                _pickImage(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.insert_drive_file,
+                  color: AppColors.grey700),
+              title: const Text('Document'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                _pickDocument(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -207,6 +309,11 @@ class _ConversationViewState extends State<_ConversationView> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      IconButton(
+                        icon: const Icon(Icons.attach_file,
+                            color: AppColors.grey500),
+                        onPressed: () => _showAttachMenu(context),
+                      ),
                       Expanded(
                         child: TextField(
                           controller: _inputController,

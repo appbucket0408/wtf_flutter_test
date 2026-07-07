@@ -21,6 +21,14 @@ class TextSent extends ConversationEvent {
   const TextSent(this.text);
 }
 
+class AttachmentSent extends ConversationEvent {
+  final AttachmentType type;
+  final String name;
+  final String base64;
+  const AttachmentSent(
+      {required this.type, required this.name, required this.base64});
+}
+
 class LoadOlderRequested extends ConversationEvent {
   const LoadOlderRequested();
 }
@@ -77,6 +85,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         super(const ConversationState()) {
     on<ConversationOpened>(_onOpened);
     on<TextSent>(_onTextSent);
+    on<AttachmentSent>(_onAttachmentSent);
     on<LoadOlderRequested>(_onLoadOlder);
     on<_MessagesChanged>(_onMessagesChanged);
     on<_SummaryChanged>((event, emit) =>
@@ -120,6 +129,26 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         text: text,
         createdAt: DateTime.now(),
         status: MessageStatus.sending,
+      ));
+    } on AppException catch (e) {
+      AppToast.error(e.userMessage);
+    }
+  }
+
+  Future<void> _onAttachmentSent(
+      AttachmentSent event, Emitter<ConversationState> emit) async {
+    try {
+      await _chat.send(Message(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        chatId: chatId,
+        senderId: me.id,
+        receiverId: peer.id,
+        text: '',
+        createdAt: DateTime.now(),
+        status: MessageStatus.sending,
+        attachmentType: event.type,
+        attachmentName: event.name,
+        attachmentData: event.base64,
       ));
     } on AppException catch (e) {
       AppToast.error(e.userMessage);

@@ -23,6 +23,61 @@ void main() {
       expect(restored.status, MessageStatus.sent);
     });
 
+    test('round-trip preserves image attachment fields', () {
+      final m = Message(
+        id: 'm2',
+        chatId: 'c1',
+        senderId: 'member_dk',
+        receiverId: 'trainer_aarav',
+        text: '',
+        createdAt: DateTime(2026, 7, 7, 18),
+        status: MessageStatus.sent,
+        attachmentType: AttachmentType.image,
+        attachmentName: 'plan.png',
+        attachmentData: 'BASE64DATA',
+      );
+      final restored = Message.fromMap(m.toMap());
+      expect(restored.attachmentType, AttachmentType.image);
+      expect(restored.attachmentName, 'plan.png');
+      expect(restored.attachmentData, 'BASE64DATA');
+      expect(restored.hasAttachment, isTrue);
+      expect(restored.preview, '📷 Photo');
+    });
+
+    test('toPreview strips the base64 blob but keeps metadata', () {
+      final m = Message(
+        id: 'm3',
+        chatId: 'c1',
+        senderId: 's',
+        receiverId: 'r',
+        text: '',
+        createdAt: DateTime(2026, 7, 7),
+        status: MessageStatus.sent,
+        attachmentType: AttachmentType.document,
+        attachmentName: 'diet.pdf',
+        attachmentData: 'HEAVYBLOB',
+      );
+      final preview = m.toPreview();
+      expect(preview.attachmentData, isNull);
+      expect(preview.attachmentName, 'diet.pdf');
+      expect(preview.preview, '📄 diet.pdf');
+    });
+
+    test('legacy message map without attachment fields defaults to none', () {
+      final legacy = {
+        'id': 'm4',
+        'chatId': 'c1',
+        'senderId': 's',
+        'receiverId': 'r',
+        'text': 'hi',
+        'createdAt': DateTime(2026, 7, 7).toIso8601String(),
+        'status': 'sent',
+      };
+      final m = Message.fromMap(legacy);
+      expect(m.attachmentType, AttachmentType.none);
+      expect(m.hasAttachment, isFalse);
+    });
+
     test('copyWith updates status only', () {
       final m = Message(
         id: 'm1',
